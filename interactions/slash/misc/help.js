@@ -18,7 +18,7 @@ module.exports = {
 	data: new SlashCommandBuilder()
 		.setName("help")
 		.setDescription(
-			"List all commands of bot or info about a specific command."
+			"List all commands and information about bot."
 		)
 		.addStringOption((option) =>
 			option
@@ -55,21 +55,22 @@ module.exports = {
 					);
 			} else {
 				helpEmbed
-					.setDescription(`No slash command with the name \`${name}\` found.`)
+					.setDescription(`No command with the name \`${name}\` found.`)
 					.setColor("Red");
 			}
 		} else {
 			// Give a list of all the commands
 
 			helpEmbed
-				.setTitle("List of all my slash commands")
+				.setTitle("List of all the commands")
 				.setDescription(
-					"`" +
+					"A bot that provides information and statistics about RetroMC and it's players.\n\n**Commands**:\n`" +
 						interaction.client.slashCommands
 							.map((command) => command.data.name)
 							.join("`, `") +
 						"`"
-				);
+				)
+				.setFooter({text: "Coded by sui and JohnyMuffin"});
 		}
 
 		// Replies to the interaction!

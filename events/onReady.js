@@ -14,6 +14,11 @@ module.exports = {
 	 * @param {import('../typings').Client} client Main Application Client.
 	 */
 	execute(client) {
+		client.user.setPresence({
+			activities: [{ name: `/help`, type: 2 }],
+			status: 'dnd',
+		  });
+
 		console.log(`Ready! Logged in as ${client.user.tag}`);
 	},
 };
