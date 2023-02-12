@@ -40,6 +40,7 @@ module.exports = {
 		 */
 		let name = interaction.options.getString("player");
 		let activity = interaction.options.getString("activity");
+        let m = ["money","playerDeaths","trustScore","playersKilled","joinCount","metersTraveled","blocksPlaced","playTime","itemsDropped","trustLevel","creaturesKilled","blocksDestroyed"];
 
 		/**
 		 * @type {EmbedBuilder}
@@ -49,10 +50,10 @@ module.exports = {
         const embed = new EmbedBuilder().setColor("Random");
 
 
-		if (name && activity) {
+
+		if (name) {
 
             // step 1 check user db
-
             axios.get(`https://j-stats.xyz/api/getUser?user=${name.toLowerCase()}`)
             .then(function(response) {
 
@@ -80,6 +81,7 @@ module.exports = {
 
 				}
                 else {
+                    if(activity) {
 
                     // step 2 send activity request
                         axios.get(`https://j-stats.xyz/api/activity?uuid=${response.data.uuid}&method=${activity}`)
@@ -94,8 +96,8 @@ module.exports = {
                             }
                             else if(response2.data.error) {
                                 embed
-                                .setTitle("Activity Error")
-                                .setDescription(`**not enough activity logged/invalid method**\n ${response2.data.methods.join("\n")}`);   
+                                .setTitle("Activity")
+                                .setDescription(`**Usage**: \`/activity [player] [activity]\`\n**Activity types**: \`${m.join("`, `")}\``);    
                             }
                             else {
                             // Create the chart
@@ -113,7 +115,7 @@ module.exports = {
                               chart.setWidth(500).setHeight(300).setBackgroundColor('#202225');
 
                               embed
-                              .setTitle(`Player Activity`)
+                              .setTitle(`Player ${response2.data.method} Activity`)
                               .setFooter({ text: `${response.data.username}'s ${response2.data.method} activity`, iconURL: `https://crafatar.com/avatars/${response.data.uuid}?size=128&overlay` })
                               .setImage(chart.getUrl())
                             }
@@ -123,16 +125,22 @@ module.exports = {
                             });  
                         });
                     }
+                    else {
+                        embed
+                        .setTitle("Activity")
+                        .setDescription(`**Usage**: \`/activity [player] [activity]\`\n**Activity types**: \`${m.join("`, `")}\``);    
+                        interaction.reply({
+                            embeds: [embed],
+                        });        
 
-
+                    }    
+                }
             });
 		}
         else {
             embed
-            .setTitle("Activity Error")
-            .setDescription("`You need to provide the agruments`");    
-
-
+            .setTitle("Activity")
+            .setDescription(`**Usage**: \`/activity [player] [activity]\`\n**Activity types**: \`${m.join("`, `")}\``);    
             interaction.reply({
                 embeds: [embed],
             });  

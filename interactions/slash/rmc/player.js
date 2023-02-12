@@ -10,7 +10,6 @@
 const { EmbedBuilder, SlashCommandBuilder } = require("discord.js");
 const axios = require('axios');
 const moment = require('moment');
-const QuickChart = require('quickchart-js');
 
 /**
  * @type {import('../../../typings').SlashInteractionCommand}
@@ -130,8 +129,8 @@ module.exports = {
 		}
         else {
             embed
-            .setTitle("Player Error")
-            .setDescription("`You need to provide the agruments`");    
+            .setTitle("Player")
+            .setDescription("**Usage**: `/player [username]`");    
 
 
             interaction.reply({

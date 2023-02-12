@@ -51,7 +51,7 @@ module.exports = {
 
 				if (command.data.description)
 					helpEmbed.setDescription(
-						command.data.description + "\n\n**Parameters:**"
+						command.data.description
 					);
 			} else {
 				helpEmbed

@@ -53,9 +53,8 @@ module.exports = {
                 {
                     
                     embed
-                    .setTitle("Village Error")
+                    .setTitle("Village Player Error")
                     .setDescription("`Error getting user`");    
-
 
                     interaction.reply({
                         embeds: [embed],
@@ -63,7 +62,7 @@ module.exports = {
                 }
 				else if(response.data.error) {
 					embed
-                    .setTitle("Village Error")
+                    .setTitle("Village Player Error")
                     .setDescription(`No record in jstats db`);  
                     
                     
@@ -82,12 +81,12 @@ module.exports = {
                             {
                                 
                                 embed
-                                .setTitle("Activity Error")
+                                .setTitle("Village Player Error")
                                 .setDescription("`Error getting user`");    
                             }
                             else if(response2.data.error) {
                                 embed
-                                .setTitle("Village Error")
+                                .setTitle("Village Player Error")
                                 .setDescription(`error`);   
                             }
                             else {
@@ -133,7 +132,7 @@ module.exports = {
 
 
                               embed
-                              .setTitle(`Village Information`)
+                              .setTitle("Village Player Info")
                               .setDescription(`**${response.data.username}**'s Villages\n\nOwns: **${final}**\nMember Of: **${final2}**\nAsst In: **${final1}**`)
                               .setThumbnail(`https://crafatar.com/avatars/${response.data.uuid}?size=128&overlay`)
                             }
@@ -149,8 +148,8 @@ module.exports = {
 		}
         else {
             embed
-            .setTitle("Village Error")
-            .setDescription("`You need to provide the agruments`");    
+            .setTitle("Village Player")
+            .setDescription("**Usage**: `/vplayer [username]`");    
 
 
             interaction.reply({

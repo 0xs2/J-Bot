@@ -37,16 +37,22 @@ module.exports = {
                     .setTitle("Server Error")
                     .setDescription("`Error getting server information`");    
                 }
-                else {
-
-                    // server players
+                else  {
+	
+		    let p = '';
+                    
+                    // server player list
+		if(response.data[0].online != 0) {
+		    // server players
                     let data  = [];
                     response.data[0].players.forEach(element => {
                         data.push(element[0]);
                     })
-                    let p = data.join(", ");
-
-                    // server player graph
+                    p = data.join(", ");
+		}
+		else {
+		p = 'No users online';
+		}
 
                 // Create the chart
                 const chart = new QuickChart();

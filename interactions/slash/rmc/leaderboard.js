@@ -19,14 +19,14 @@ module.exports = {
 	// The data needed to register slash commands to Discord.
 
 	data: new SlashCommandBuilder()
-		.setName("leaderboard")
-		.setDescription(
+	.setName("leaderboard")
+	.setDescription(
 			"Get the leaderboards on RetroMC."
 		)
 		.addStringOption((option) =>
 			option
-				.setName("leaderboard")
-				.setDescription("The specific leaderboard to get information on RetroMC.")
+				.setName("category")
+				.setDescription("The specific leaderboard category")
 		),
 
 	async execute(interaction) {
@@ -35,6 +35,7 @@ module.exports = {
 		 * @description The "command" argument
 		 */
 		let name = interaction.options.getString("leaderboard");
+		let m = ["money","playerDeaths","trustScore","playersKilled","joinCount","metersTraveled","blocksPlaced","playTime","itemsDropped","trustLevel","creaturesKilled","blocksDestroyed","memberCount","assistantsCount","claims","mostChatMessages"];
 
 		/**
 		 * @type {EmbedBuilder}
@@ -42,10 +43,9 @@ module.exports = {
 		 */
 
 		const embed = new EmbedBuilder().setColor("Random");
-
 		if (name) {
 
-            axios.get(`https://j-stats.xyz/api/leaderboard?category=${name.toLowerCase()}`)
+            axios.get(`https://j-stats.xyz/api/leaderboard?category=${name}`)
             .then(function(response) {
             
                 if(response.status == 503 || response.status == 500 || response.status == 400)
@@ -58,9 +58,10 @@ module.exports = {
 				else if(response.data.error) {
 					embed
                     .setTitle("Leaderboard")
-                    .setDescription(`**Available agruments : **\n ${response.data.categories.join("\n")} `);   
+					.setDescription(`**Usage**: \`/leaderboard [category]\`\n**Available categories**: \`${m.join("`, `")}\``);   
 				}
                 else {
+
 
 					const co = {
 						columns: [
@@ -93,22 +94,20 @@ module.exports = {
                     .setTitle(`${response.data.category_name} Leaderboard`)
                     .setDescription("```" + e + "```");
                 }
-
-                interaction.reply({
-                    embeds: [embed],
-                });
-            });
+			interaction.reply({
+				embeds: [embed],
+			});
+		});
 
 		}
 		else {
 			embed
-            .setTitle("Leaderboard Error")
-            .setDescription("`You need to provide the agruments`");    
+			.setTitle("Leaderboard")
+			.setDescription(`**Usage**: \`/leaderboard [category]\`\n**Available categories**: \`${m.join("`, `")}\``);   
 
-
-            interaction.reply({
-                embeds: [embed],
-            });  
+			interaction.reply({
+				embeds: [embed],
+			});  
 		}
 	}
 };
