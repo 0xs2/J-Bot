@@ -48,7 +48,7 @@ module.exports = {
                     response.data[0].players.forEach(element => {
                         data.push(element[0]);
                     })
-                    p = data.join(", ");
+                    p = `\`${data.join("`, `")}\``;
 		}
 		else {
 		p = 'No users online';
@@ -68,17 +68,33 @@ module.exports = {
 
                   chart.setWidth(500).setHeight(300).setBackgroundColor('#202225');
 
-                embed
-                .setTitle(`${response.data[0].online} Players Online`)
-                .setDescription(p)
-                .setImage(chart.getUrl())
-                }
+                // step 2 get the stats data
+                axios.get(`https://j-stats.xyz/api/server`)
+                .then(function(response2) {
 
-                interaction.reply({
-                    embeds: [embed]
+                    let stats = '';
+
+                    if(response2.status == 503 || response2.status == 500 || response2.status == 400)
+                    {
+                        stats = 'Server: Could not fetch information';
+                    }
+                    else  {
+                        stats = `${response2.data.daily_total} today's peak, ${response2.data.monthly_total} month peak,  ${response2.data.peek_total} all time peak`
+                    }
+
+                    embed
+                    .setTitle(`${response.data[0].online} Players Online`)
+                    .setDescription(p)
+                    .setImage(chart.getUrl())
+                    .setFooter({text: stats})
+    
+                    interaction.reply({
+                        embeds: [embed]
+                    });
+
                 });
-            });
-          
+            }
+        });
 	}
     
 };

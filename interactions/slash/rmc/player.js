@@ -20,7 +20,7 @@ module.exports = {
 	data: new SlashCommandBuilder()
 		.setName("player")
 		.setDescription(
-			"Get the Player's Player on RetroMC."
+			"Get the Player's Statistics."
 		)
 		.addStringOption((option) =>
 			option
@@ -100,6 +100,7 @@ module.exports = {
                               .setDescription(
                                 `
                                 Playtime: **${moment.duration({"seconds": response2.data.playTime}).humanize()}**
+				Rank: **${capitlizeText(response2.data.groups[0])}**
                                 Join Count: **${response2.data.joinCount}**
                                 Joined: **${moment.unix(response2.data.firstJoin).format("L")}**
                                 Last Join: **${moment.unix(response2.data.lastJoin).format("L")}**
@@ -137,5 +138,8 @@ module.exports = {
                 embeds: [embed],
             });  
         }
+        function capitlizeText(word) {
+		            return word.charAt(0).toUpperCase() + word.slice(1);
+		     }
 	}
 };

@@ -34,7 +34,7 @@ module.exports = {
 		 * @type {string}
 		 * @description The "command" argument
 		 */
-		let name = interaction.options.getString("leaderboard");
+		let name = interaction.options.getString("category");
 		let m = ["money","playerDeaths","trustScore","playersKilled","joinCount","metersTraveled","blocksPlaced","playTime","itemsDropped","trustLevel","creaturesKilled","blocksDestroyed","memberCount","assistantsCount","claims","mostChatMessages"];
 
 		/**
