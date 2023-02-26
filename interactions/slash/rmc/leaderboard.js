@@ -7,9 +7,14 @@
 
 // Deconstructed the constants we need in this file.
 
-const { EmbedBuilder, SlashCommandBuilder } = require("discord.js");
+const {
+	EmbedBuilder,
+	SlashCommandBuilder
+} = require("discord.js");
 const axios = require('axios');
-const { table } = require('table');
+const {
+	table
+} = require('table');
 
 
 /**
@@ -19,14 +24,15 @@ module.exports = {
 	// The data needed to register slash commands to Discord.
 
 	data: new SlashCommandBuilder()
-	.setName("leaderboard")
-	.setDescription(
+		.setName("leaderboard")
+		.setDescription(
 			"Get the leaderboards on RetroMC."
 		)
 		.addStringOption((option) =>
 			option
-				.setName("category")
-				.setDescription("The specific leaderboard category")
+			.setName("category")
+			.setDescription("The specific leaderboard category")
+			.setRequired(true)
 		),
 
 	async execute(interaction) {
@@ -35,7 +41,7 @@ module.exports = {
 		 * @description The "command" argument
 		 */
 		let name = interaction.options.getString("category");
-		let m = ["money","playerDeaths","trustScore","playersKilled","joinCount","metersTraveled","blocksPlaced","playTime","itemsDropped","trustLevel","creaturesKilled","blocksDestroyed","memberCount","assistantsCount","claims","mostChatMessages"];
+		let m = ["money", "playerDeaths", "trustScore", "playersKilled", "joinCount", "metersTraveled", "blocksPlaced", "playTime", "itemsDropped", "trustLevel", "creaturesKilled", "blocksDestroyed", "memberCount", "assistantsCount", "claims", "mostChatMessages"];
 
 		/**
 		 * @type {EmbedBuilder}
@@ -44,70 +50,53 @@ module.exports = {
 
 		const embed = new EmbedBuilder().setColor("Random");
 		if (name) {
+			axios.get(`https://j-stats.xyz/api/v2/leaderboard?category=${name}`)
+				.then(function (response) {
 
-            axios.get(`https://j-stats.xyz/api/leaderboard?category=${name}`)
-            .then(function(response) {
-            
-                if(response.status == 503 || response.status == 500 || response.status == 400)
-                {
-                    
-                    embed
-                    .setTitle("Leaderboard Error")
-                    .setDescription("`Error getting leaderboard information`");    
-                }
-				else if(response.data.error) {
-					embed
-                    .setTitle("Leaderboard")
-					.setDescription(`**Usage**: \`/leaderboard [category]\`\n**Available categories**: \`${m.join("`, `")}\``);   
-				}
-                else {
+					if (response.status == 503 || response.status == 500 || response.status == 400) {
 
+						embed
+							.setTitle("Error :(")
+                            .setDescription("Could not fetch from API")
+                            .setColor("#FF0000")
+					} else if (response.data.code == 4) {
+						embed
+							.setTitle("Invalid Leaderboard Option")
+							.setDescription(`**Available categories**: \`${m.join("`, `")}\``)
+                            .setColor("#FF0000")
+					} else {
 
-					const co = {
-						columns: [
-							{
-							width: 2
-							},
-							{
-							  width: 10
-							},
-							{
-							  width: 25
-							}
-						  ],
-						  drawHorizontalLine: (lineIndex, rowCount) => {
-							return lineIndex === 0 || lineIndex === 1 || lineIndex === rowCount;
-						  }
-					};
-					
-					let builder = [];
+						let ke = [];
+						let key = [];
+						let value = [];
 
-					builder.push(["#", response.data.category_name, response.data.type]);
+						response.data.data.forEach((element, k) => {
+							ke.push(k + 1);
+							key.push(element.key);
+							value.push(element.value);
+						});
 
-					response.data.data.forEach((element, k) => {
-                        builder.push([k+1, element[response.data.category], element.username]);
-                    });
-
-					let e = table(builder,co);
-
-                    embed
-                    .setTitle(`${response.data.category_name} Leaderboard`)
-                    .setDescription("```" + e + "```");
-                }
-			interaction.reply({
-				embeds: [embed],
-			});
-		});
-
-		}
-		else {
-			embed
-			.setTitle("Leaderboard")
-			.setDescription(`**Usage**: \`/leaderboard [category]\`\n**Available categories**: \`${m.join("`, `")}\``);   
-
-			interaction.reply({
-				embeds: [embed],
-			});  
+						embed
+							.setTitle(`${response.data.category_name} Leaderboard`)
+							.setURL(`https://j-stats.xyz/leaderboard`)
+							.addFields({
+								name: '#',
+								value: ke.join('\n'),
+								inline: true
+							}, {
+								name: response.data.type,
+								value: key.join('\n'),
+								inline: true
+							}, {
+								name: response.data.category_name,
+								value: value.join('\n'),
+								inline: true
+							});
+					}
+					interaction.reply({
+						embeds: [embed],
+					});
+				});
 		}
 	}
 };

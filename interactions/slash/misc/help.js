@@ -7,7 +7,10 @@
 
 // Deconstructed the constants we need in this file.
 
-const { EmbedBuilder, SlashCommandBuilder } = require("discord.js");
+const {
+	EmbedBuilder,
+	SlashCommandBuilder
+} = require("discord.js");
 
 /**
  * @type {import('../../../typings').SlashInteractionCommand}
@@ -22,8 +25,8 @@ module.exports = {
 		)
 		.addStringOption((option) =>
 			option
-				.setName("command")
-				.setDescription("The specific command to see the info of.")
+			.setName("command")
+			.setDescription("The specific command to see the info of.")
 		),
 
 	async execute(interaction) {
@@ -63,14 +66,17 @@ module.exports = {
 
 			helpEmbed
 				.setTitle("List of all the commands")
-				.setDescription(
-					"A bot that provides information and statistics about RetroMC and it's players.\n\n**Commands**:\n`" +
-						interaction.client.slashCommands
-							.map((command) => command.data.name)
-							.join("`, `") +
-						"`"
+				.addFields({name: "Credit", value: "sui, JohnyMuffin", inline: true}, 
+				{name: "Powered By", value: "j-stats.xyz", inline: true}, 
+				{name: "Commands", value: "`" + interaction.client.slashCommands.map((command) => command.data.name).join("`, `") + "`"}, 
 				)
-				.setFooter({text: "Coded by sui and JohnyMuffin"});
+				.setDescription(
+					"A bot that provides information and statistics about RetroMC and it's players"
+				)
+				.setFooter({
+					text: "https://github.com/0xs2/retromc-stats",
+					iconURL: "https://avatars.githubusercontent.com/u/116229905?v=4"
+				});
 		}
 
 		// Replies to the interaction!

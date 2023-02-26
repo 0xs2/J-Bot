@@ -7,7 +7,10 @@
 
 // Deconstructed the constants we need in this file.
 
-const { EmbedBuilder, SlashCommandBuilder } = require("discord.js");
+const {
+    EmbedBuilder,
+    SlashCommandBuilder
+} = require("discord.js");
 const axios = require('axios');
 const moment = require('moment');
 
@@ -15,131 +18,132 @@ const moment = require('moment');
  * @type {import('../../../typings').SlashInteractionCommand}
  */
 module.exports = {
-	// The data needed to register slash commands to Discord.
+    // The data needed to register slash commands to Discord.
 
-	data: new SlashCommandBuilder()
-		.setName("player")
-		.setDescription(
-			"Get the Player's Statistics."
-		)
-		.addStringOption((option) =>
-			option
-				.setName("username")
-				.setDescription("Enter a Player username")
-    ),
+    data: new SlashCommandBuilder()
+        .setName("player")
+        .setDescription(
+            "Get the Player's Statistics."
+        )
+        .addStringOption((option) =>
+            option
+            .setName("username")
+            .setDescription("Enter a Player username")
+            .setRequired(true)
+        ),
 
-	async execute(interaction) {
-		/**
-		 * @type {string}
-		 * @description The "command" argument
-		 */
-		let name = interaction.options.getString("username");
+    async execute(interaction) {
+        /**
+         * @type {string}
+         * @description The "command" argument
+         */
+        let name = interaction.options.getString("username");
 
-		/**
-		 * @type {EmbedBuilder}
-		 * @description Help command's embed
-		 */
+        /**
+         * @type {EmbedBuilder}
+         * @description Help command's embed
+         */
 
         const embed = new EmbedBuilder().setColor("Random");
 
 
-		if (name) {
+        if (name) {
 
-            // step 1 check user db
+            axios.get(`https://j-stats.xyz/api/v2/player?user=${name.toLowerCase()}`)
+                .then(function (response) {
 
-            axios.get(`https://j-stats.xyz/api/getUser?user=${name.toLowerCase()}`)
-            .then(function(response) {
+                    if (response.status == 503 || response.status == 500 || response.status == 400) {
 
-                if(response.status == 503 || response.status == 500 || response.status == 400)
-                {
-                    
-                    embed
-                    .setTitle("Player Error")
-                    .setDescription("`Error getting user`");    
+                        embed
+                            .setTitle("Error :(")
+                            .setDescription("Could not fetch from API")
+                            .setColor("#FF0000")
+                    } else if (response.data.code == 2) {
 
+                        embed
+                            .setTitle("Error :(")
+                            .setDescription(`Could not find this user`)
+                            .setColor("#FF0000")
+                    } else {
 
-                    interaction.reply({
-                        embeds: [embed],
-                    });  
-                }
-				else if(response.data.error) {
-					embed
-                    .setTitle("Player Error")
-                    .setDescription(`No Mojang Username exists for this user`);  
-                    
-                    
-                    interaction.reply({
-                        embeds: [embed],
-                    });  
+                        embed
+                            .setTitle(`Player ${response.data.username}`)
+                            .setURL(`https://j-stats.xyz/player?u=${response.data.uuid}`)
+                            .setThumbnail(`https://crafatar.com/avatars/${response.data.uuid}?size=128&overlay`)
+                            .setDescription(
+                                `This is ${response.data.username}'s Information`
+                            )
 
-				}
-                else {
+                            .addFields({
+                                name: 'Group',
+                                value: response.data.group
+                            })
+                            // time field
+                            .addFields({
+                                name: 'Playtime',
+                                value: moment.duration(response.data.playTime, 'seconds').hours() + ' hours',
+                                inline: true
+                            }, {
+                                name: 'Joined',
+                                value: moment.unix(response.data.firstJoin).format("L"),
+                                inline: true
+                            }, {
+                                name: 'Last Join',
+                                value: moment.unix(response.data.lastJoin).format("L"),
+                                inline: true
+                            })
+                            // statistics field
+                            .addFields({
+                                    name: 'Trust Level',
+                                    value: response.data.trustLevel.toString(),
+                                    inline: true
+                                }, {
+                                    name: 'Trust Score',
+                                    value: response.data.trustScore.toString(),
+                                    inline: true
+                                }, {
+                                    name: 'Balance',
+                                    value: response.data.money.toString(),
+                                    inline: true
+                                }
 
-                    // step 2 send player request
-                        axios.get(`https://statistics.johnymuffin.com/api/v1/getUser?serverID=0&uuid=${response.data.uuid}`)
-                        .then(function(response2) {
-               
-                            if(response2.status == 503 || response2.status == 500 || response2.status == 400)
-                            {
-                                
-                                embed
-                                .setTitle("Player Error")
-                                .setDescription("`Error getting user`");    
-                            }
-                            else if(!response2.data.found) {
-                                embed
-                                .setTitle("Player Error")
-                                .setDescription(`Could not find this user`);   
-                            }
-                            else {
+                            )
+                            .addFields({
+                                name: 'Mobs Killed',
+                                value: response.data.creaturesKilled.toString(),
+                                inline: true
+                            }, {
+                                name: 'Players Killed',
+                                value: response.data.playersKilled.toString(),
+                                inline: true
+                            }, {
+                                name: 'Meters Traveled',
+                                value: response.data.metersTraveled.toString(),
+                                inline: true
+                            })
+                            .addFields({
+                                name: 'Blocks Placed',
+                                value: response.data.blocksPlaced.toString(),
+                                inline: true
+                            }, {
+                                name: 'Blocks Destroyed',
+                                value: response.data.blocksDestroyed.toString(),
+                                inline: true
+                            }, {
+                                name: 'Items Dropped',
+                                value: response.data.itemsDropped.toString(),
+                                inline: true
+                            }, )
+                            .setFooter({
+                                text: `${response.data.uuid} (UUID)`
+                            })
 
-   
-                              embed
-                              .setTitle(`${response.data.username}'s Information`)
-                              .setThumbnail(`https://crafatar.com/avatars/${response.data.uuid}?size=128&overlay`)
-                              .setDescription(
-                                `
-                                Playtime: **${moment.duration({"seconds": response2.data.playTime}).humanize()}**
-				Rank: **${capitlizeText(response2.data.groups[0])}**
-                                Join Count: **${response2.data.joinCount}**
-                                Joined: **${moment.unix(response2.data.firstJoin).format("L")}**
-                                Last Join: **${moment.unix(response2.data.lastJoin).format("L")}**
-                                Trust Level: **${response2.data.trustLevel}**
-                                Trust Score: **${Math.floor(response2.data.trustScore)}**
-                                Balance: **${Math.floor(response2.data.money)}**
-                                Killed: **${response2.data.playersKilled}**
-                                Mobs Killed: **${response2.data.creaturesKilled}**
-                                Deaths: **${response2.data.playerDeaths}**
-                                Blocks Placed: **${response2.data.blocksPlaced}**
-                                Blocks Destroyed: **${response2.data.blocksDestroyed}**
-                                Items Dropped: **${response2.data.itemsDropped}**
-                                Meters Traveled: **${response2.data.metersTraveled}**
-                                `
-                              )
-                              .setFooter({text: `${response.data.uuid} (UUID)`})
-                            }
-
-                            interaction.reply({
-                                embeds: [embed],
-                            });  
-                        });
                     }
 
-
-            });
-		}
-        else {
-            embed
-            .setTitle("Player")
-            .setDescription("**Usage**: `/player [username]`");    
-
-
-            interaction.reply({
-                embeds: [embed],
-            });  
+                    interaction.reply({
+                        embeds: [embed],
+                    });
+                });
         }
-        function capitlizeText(word) {
-		            return word.charAt(0).toUpperCase() + word.slice(1);
-		     }
-	}
+    }
 };
