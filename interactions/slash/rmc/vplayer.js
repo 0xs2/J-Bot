@@ -61,13 +61,19 @@ module.exports = {
                             .setTitle("Error :(")
                             .setDescription(`Could not find this user`)
                             .setColor("#FF0000")
-                    } else {
+                    } else if (response.data.code == 5) {
+                                                embed
+                            .setTitle("Uh oh!")
+                            .setDescription(`This user has no village data to show.`)
+                            .setColor("#FF0000")
+                    }
+                    else {
 
                         // handle this shit
                         let final = '';
-                        if (typeof response.data.owner != 'undefined' && response.data.owner.length != 0) {
+                        if (response.data.data.owner != 0) {
                             let o = [];
-                            response.data.owner.forEach(l => {
+                            response.data.data.owner.forEach(l => {
                                 o.push(l.village);
                             });
                             final = o.join('\n');
@@ -76,9 +82,9 @@ module.exports = {
                         }
 
                         let final1 = '';
-                        if (typeof response.data.assistant != 'undefined' && response.data.assistant.length != 0) {
+                        if(response.data.data.assistant != 0) {
                             let a = [];
-                            response.data.assistant.forEach(k => {
+                            response.data.data.assistant.forEach(k => {
                                 a.push(k.village);
                             });
                             final1 = a.join("\n");
@@ -88,9 +94,9 @@ module.exports = {
 
 
                         let final2 = '';
-                        if (typeof response.data.member != 'undefined' && response.data.member.length != 0) {
+                        if (response.data.data.member != 0) {
                             let a = [];
-                            response.data.member.forEach(k => {
+                            response.data.data.member.forEach(k => {
                                 a.push(k.village);
                             });
                             final2 = a.join("\n");
@@ -101,7 +107,6 @@ module.exports = {
 
 
                         embed
-
                             .setTitle(`${response.data.username}'s Villages`)
                             .addFields({
                                 name: "Owns",
